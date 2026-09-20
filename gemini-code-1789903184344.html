@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9. Sinif Edebiyat Portali - Maarif Modeli</title>
+    <style>
+        :root {
+            --primary-bg: #0f172a;
+            --accent-blue: #2563eb;
+            --main-bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #1e293b;
+            --border-color: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background-color: var(--main-bg);
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 290px;
+            background-color: var(--primary-bg);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar h2 {
+            font-size: 1.1rem;
+            color: #60a5fa;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 10px;
+        }
+
+        .nav-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.88rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background-color: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+
+        /* Main Area */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-blue);
+        }
+
+        .card h3 {
+            color: var(--primary-bg);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        /* Modal Popups */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 850px;
+            width: 90%;
+            max-height: 88vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .modal-body-text {
+            margin-top: 15px;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .poem-box {
+            white-space: pre-line;
+            font-style: italic;
+            background: #fffbe0;
+            padding: 20px;
+            border-left: 5px solid #f59e0b;
+            margin-top: 15px;
+            border-radius: 4px;
+        }
+
+        /* Quiz UI */
+        .unit-quiz-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 25px;
+        }
+
+        .unit-quiz-container h3 {
+            margin-bottom: 15px;
+            color: var(--accent-blue);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .quiz-question {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .quiz-option {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .quiz-option:hover {
+            background: #e2e8f0;
+        }
+
+        /* Matching Game */
+        .game-card {
+            text-align: center;
+            padding: 25px;
+            font-weight: bold;
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .game-card.selected {
+            border-color: var(--accent-blue);
+            background: #dbeafe;
+        }
+
+        .game-card.matched {
+            background: #dcfce7;
+            border-color: #22c55e;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Edebiyat Portali</h2>
+        <button class="nav-btn active" onclick="showSection('topics')">MEB 8 Unite Konulari</button>
+        <button class="nav-btn" onclick="showSection('maarif')">Maarif Modeli Yaklasimi</button>
+        <button class="nav-btn" onclick="showSection('poems')">Siir Galerisi (Tam Metin)</button>
+        <button class="nav-btn" onclick="showSection('authors')">Sairler ve Eserleri</button>
+        <button class="nav-btn" onclick="showSection('quizzes')">Unite Testleri (8 Unite)</button>
+        <button class="nav-btn" onclick="showSection('game')">Eslesme Oyunu</button>
+    </div>
+
+    <div class="main-content">
+
+        <!-- 8 UNITE KONULARI -->
+        <div id="topics" class="section active">
+            <h1>9. Sinif Edebiyat Tum Konulari (2026-2027 MEB)</h1>
+            <p>Detayli müfredat icerigini okumak icin ilgili unite kartina tiklayiniz.</p>
+            
+            <div class="card-grid">
+                <div class="card" onclick="openModal('u1_detail')">
+                    <h3>1. Unite: giris</h3>
+                    <p>Edebiyat kavramı, sanatla ve bilimle iliskisi, metinlerin siniflandirilmasi, dilin kullanimdan dogan turleri.</p>
+                </div>
+                <div class="card" onclick="openModal('u2_detail')">
+                    <h3>2. Unite: Hikaye (Öyku)</h3>
+                    <p>Olay ve durum hikayesi, hikayenin yapısı, anlatici bakis acilari, anlatim teknikleri ve Turk edebiyatinda hikaye.</p>
+                </div>
+                <div class="card" onclick="openModal('u3_detail')">
+                    <h3>3. Unite: Siir</h3>
+                    <p>Siirde ahenk unsurlari, olcu, kafiye, redif, nazim birimi, zihniyet, imge, edebi sanatlar ve siir turleri.</p>
+                </div>
+                <div class="card" onclick="openModal('u4_detail')">
+                    <h3>4. Unite: Roman</h3>
+                    <p>Roman turunun ozellikleri, yapisi, anlatim teknikleri, roman turleri ve dunya edebiyatinda roman.</p>
+                </div>
+                <div class="card" onclick="openModal('u5_detail')">
+                    <h3>5. Unite: Tiyatro</h3>
+                    <p>Tiyatro terimleri, dramatik orgu, komedya, tragedya, dram ve Geleneksel Turk Tiyatrosu esaslari.</p>
+                </div>
+                <div class="card" onclick="openModal('u6_detail')">
+                    <h3>6. Unite: Biyografi / Otobiyografi</h3>
+                    <p>Biyografi, otobiyografi, monografi, tezkire, portre ve ozgecmis (CV) hazırlama kurallari.</p>
+                </div>
+                <div class="card" onclick="openModal('u7_detail')">
+                    <h3>7. Unite: Mektup ve E-Posta</h3>
+                    <p>Ozel, edebi, resmi ve is mektuplari, dilekce yazim kurallari ve dijital e-posta standartlari.</p>
+                </div>
+                <div class="card" onclick="openModal('u8_detail')">
+                    <h3>8. Unite: Gunluk ve Anı</h3>
+                    <p>Gunluk ve ani turlerinin ayirici ozellikleri, tarihsel gelisimi ve onemli temsilcileri.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAARIF MODELI -->
+        <div id="maarif" class="section">
+            <h1>Turkiye Yuzyili Maarif Modeli Yaklasimi</h1>
+            <p>2026-2027 yeni mufredat vizyonu detaylarini incelemek icin kartlara tiklayiniz.</p>
+            <div class="card-grid">
+                <div class="card" onclick="openModal('m_analiz')">
+                    <h3>Metin Analizi ve Elestirel Okuma</h3>
+                    <p>Ezberci sistemden uzaklasip metnin sosyolojik, felsefi ve baglamsal yapisini analiz etme becerisi.</p>
+                </div>
+                <div class="card" onclick="openModal('m_deger')">
+                    <h3>Kulturel Birikim ve Deger Aktarimi</h3>
+                    <p>Milli ve manevi degerlerin edebiyat eserleri uzerinden estetik bir dille kavranmasi.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SIIR GALERISI -->
+        <div id="poems" class="section">
+            <h1>Ozel Siir Galerisi (Tam Metinler)</h1>
+            <p>Siirlerin tamamini okumak icin kartlara tiklayiniz.</p>
+            <div class="card-grid">
+                <div class="card" onclick="openModal('p1')">
+                    <h3>1. Surgun Ulkeden Baskentler Baskentine</h3>
+                    <p>Sezai Karakoc</p>
+                </div>
+                <div class="card" onclick="openModal('p2')">
+                    <h3>2. Munacat</h3>
+                    <p>Ismet Ozel</p>
+                </div>
+                <div class="card" onclick="openModal('p3')">
+                    <h3>3. Kaldirimlar</h3>
+                    <p>Necip Fazil Kisakurek</p>
+                </div>
+                <div class="card" onclick="openModal('p4')">
+                    <h3>4. Bekleyen</h3>
+                    <p>Necip Fazil Kisakurek</p>
+                </div>
+                <div class="card" onclick="openModal('p5')">
+                    <h3>5. Monarosa</h3>
+                    <p>Sezai Karakoc</p>
+                </div>
+                <div class="card" onclick="openModal('p6')">
+                    <h3>6. Ihlamurlar Cicek Aqtigi Zaman</h3>
+                    <p>Bahaettin Karakoc</p>
+                </div>
+                <div class="card" onclick="openModal('p7')">
+                    <h3>7. Kayit</h3>
+                    <p>Cahit Zarifoglu</p>
+                </div>
+                <div class="card" onclick="openModal('p8')">
+                    <h3>8. Ben Sana Mecburum</h3>
+                    <p>Attila Ilhan</p>
+                </div>
+                <div class="card" onclick="openModal('p9')">
+                    <h3>9. Bulmak</h3>
+                    <p>Erdem Bayazit</p>
+                </div>
+                <div class="card" onclick="openModal('p10')">
+                    <h3>10. Otuz Bes Yas</h3>
+                    <p>Cahit Sitki Taranci</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SAIRLER VE ESERLERI -->
+        <div id="authors" class="section">
+            <h1>Sair Hayatlari ve Kitap Kapaklari</h1>
+            <div class="card-grid">
+                <div class="card" onclick="openModal('a_sezai')">
+                    <h3>Sezai Karakoc</h3>
+                    <p>Hayati, fikir dunyasi, II. Yeni akimindaki yeri ve eserleri.</p>
+                </div>
+                <div class="card" onclick="openModal('a_necip')">
+                    <h3>Necip Fazil Kisakurek</h3>
+                    <p>Mistik siir anlayisi, Kaldirimlar sairi unvani ve kitaplari.</p>
+                </div>
+                <div class="card" onclick="openModal('a_attila')">
+                    <h3>Attila Ilhan</h3>
+                    <p>Mavi akimi, romanciligi ve toplumcu gercekci yonu.</p>
+                </div>
+                <div class="card" onclick="openModal('a_cahit')">
+                    <h3>Cahit Sitki Taranci</h3>
+                    <p>Saf siir anlayisi, olum ve yasama sevinci temalari.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNITE TESTLERI (8 UNITE) -->
+        <div id="quizzes" class="section">
+            <h1>9. Sinif Edebiyat Unite Testleri (2026-2027)</h1>
+
+            <!-- UNITE 1 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>1. Unite Testi: giris</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Edebiyatin dogrudan insan psikolojisini ve ic dunyasini konu alarak etkilesim kurdugu bilim dalı hangisidir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Tarih</button>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Psikoloji</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Cografya</button>
+                </div>
+                <div class="quiz-question">
+                    <p><strong>Soru 2:</strong> Bir dilin tarihi süreçte takip edilemeyen donemlerinde ayrilmis kollara ne ad verilir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Lehce</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Sive</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Agiz</button>
+                </div>
+            </div>
+
+            <!-- UNITE 2 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>2. Unite Testi: Hikaye (Öyku)</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Olay hikayesinin (Maupassant tarzi) Turk edebiyatindaki en onemli temsilcisi kimdir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Sait Faik Abasiyanik</button>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Omer Seyfettin</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Memduh Sevket Esendal</button>
+                </div>
+                <div class="quiz-question">
+                    <p><strong>Soru 2:</strong> Anlaticinin olaylari, kahramanlarin duygu ve dusuncelerini her seyiyle bildigi bakis acisi hangisidir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Hakim (Tanrisal) Bakis Acisi</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Kahraman Bakis Acisi</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Gozlemci Bakis Acisi</button>
+                </div>
+            </div>
+
+            <!-- UNITE 3 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>3. Unite Testi: Siir</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Dize sonlarinda en az iki ses benzerligine dayanan kafiye turu hangisidir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Yarim Kafiye</button>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Tam Kafiye</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Cinasli Kafiye</button>
+                </div>
+            </div>
+
+            <!-- UNITE 4 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>4. Unite Testi: Roman</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Turk edebiyatinda ilk yerli roman kabul edilen eser hangisidir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Taassuk-u Talat ve Fitnat</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Intibah</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Mai ve Siyah</button>
+                </div>
+            </div>
+
+            <!-- UNITE 5 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>5. Unite Testi: Tiyatro</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Geleneksel Turk Tiyatrosunda perde arkasinda oynatilan golge oyunu hangisidir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Karagoz</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Ortaoyunu</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Meddah</button>
+                </div>
+            </div>
+
+            <!-- UNITE 6 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>6. Unite Testi: Biyografi / Otobiyografi</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Divan edebiyatinda sairlerin hayatlarinin anlatildigi biyografik eserlere ne ad verilir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Tezkire</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Münseat</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Siyer</button>
+                </div>
+            </div>
+
+            <!-- UNITE 7 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>7. Unite Testi: Mektup ve E-Posta</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Resmi makamlara bir dilegi veya sikayeti iletmek amacıyla yazılan kisa metin hangisidir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Dilekce</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Tutanak</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Rapor</button>
+                </div>
+            </div>
+
+            <!-- UNITE 8 TESTI -->
+            <div class="unit-quiz-container">
+                <h3>8. Unite Testi: Gunluk ve Anı</h3>
+                <div class="quiz-question">
+                    <p><strong>Soru 1:</strong> Olaylarin yasadigi anda, gunu gunune yazildigi edebi tur hangisidir?</p>
+                    <button class="quiz-option" onclick="checkAns(this, true)">Gunluk</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Anı</button>
+                    <button class="quiz-option" onclick="checkAns(this, false)">Gezi Yazısı</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESLESME OYUNU -->
+        <div id="game" class="section">
+            <h1>Sair - Eser Eslesme Oyunu</h1>
+            <p>Dogru sair ile eseri ard arda secerek eslestirin!</p>
+            <div class="card-grid" id="game-board" style="margin-top:20px;"></div>
+        </div>
+
+    </div>
+
+    <!-- MODAL WINDOW -->
+    <div id="modal_window" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal_title" style="color: var(--primary-bg);"></h2>
+            <div id="modal_body" class="modal-body-text"></div>
+        </div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            const buttons = document.querySelectorAll('.nav-btn');
+
+            sections.forEach(sec => sec.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(sectionId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (sectionId === 'game') {
+                initGame();
+            }
+        }
+
+        const modalData = {
+            'u1_detail': {
+                title: '1. Unite: giris Detayli Bilgi',
+                content: '<p><strong>Edebiyatın Tanimi:</strong> Duygu, dusunce ve hayallerin dil vasitasiyla estetik ve etkileyici bir sekilde ifade edilmesidir.</p><p><strong>Edebiyatin Bilimlerle Iliskisi:</strong> Edebiyat insanı merkezine alir. Bu yuzden Tarih, Psikoloji, Sosyoloji, Felsefe ve Cografya ile dogrudan iliski icindedir.</p><p><strong>Dilin Kullanımdan Dogan Turleri:</strong><br>- Lehce: Tarihi karanlik donemde ayrilmis kollar (Cuvasca, Yakutca).<br>- Sive: Bilinen donemde ayrilmis kollar (Azerbaycan Turkcesi).<br>- Agiz: Bir ulke icindeki bolgesel soyleyis farkliliklari (Karadeniz agzi).<br>- Argo ve Jargon: Ozel gruplarin kendi aralarinda kullandigi kelimeler.</p>'
+            },
+            'u2_detail': {
+                title: '2. Unite: Hikaye (Öyku) Detayli Bilgi',
+                content: '<p><strong>Hikayenin Yapı Unsuru:</strong> Kişiler, Mekan, Zaman ve Olay Orgusu.</p><p><strong>Olay Hikayesi:</strong> Guy de Maupassant tarafindan gelistirilmistir. Serim, dugum ve cozum bölümlerinden olusur. Omer Seyfettin en onemli temsilcimizdir.</p><p><strong>Durum Hikayesi:</strong> Anton Cehov tarafindan gelistirilmistir. Hayattan bir kesit sunulur. Sait Faik Abasiyanik ve Memduh Sevket Esendal temsilcileridir.</p><p><strong>Anlatim Teknikleri:</strong> Aciklama, Ozetiye, Ic Konusma, Bilincakisi ve Diyalog.</p>'
+            },
+            'u3_detail': {
+                title: '3. Unite: Siir Detayli Bilgi',
+                content: '<p><strong>Ahenk Unsurlari:</strong> Olcu (Hece, Aruz, Serbest), Kafiye ve Redif.</p><p><strong>Kafiye Turleri:</strong><br>- Yarim Kafiye: Tek ses benzerligi.<br>- Tam Kafiye: Iki ses benzerligi.<br>- Zengin Kafiye: Uc veya daha fazla ses benzerligi.<br>- Cinasli Kafiye: Sestes kelimelerle yapilan kafiye.</p><p><strong>Edebi Sanatlar:</strong> Tesbih (Benzetme), Istiare (Egretileme), Teshis (Kisilestirme), Intak (Konusturma), Tezat (Karsitlik).</p>'
+            },
+            'u4_detail': {
+                title: '4. Unite: Roman Detayli Bilgi',
+                content: '<p><strong>Roman Türü:</strong> Yasanmis ya da yasanmasi mumkun olaylarin anlatildigi uzun edebi turdur. Hikayeden farki kisi kadrosunun genisligi ve mekan tasvirlerinin detayliligidir.</p><p><strong>Roman Turleri:</strong> Tarihi, Macera, Psikolojik, Polisiye, Sosyal ve Bilim Kurgu romanlari.</p>'
+            },
+            'u5_detail': {
+                title: '5. Unite: Tiyatro Detayli Bilgi',
+                content: '<p><strong>Modern Tiyatro:</strong> Tragedya (Trajedi), Komedya (Komedi) ve Dram.</p><p><strong>Geleneksel Turk Tiyatrosu:</strong> Karagoz (Golge oyunu), Ortaoyunu, Meddah ve Koy Seyirlik Oyunlari. Yazili bir metne dayanmaz, dogaclama oynanir.</p>'
+            },
+            'u6_detail': {
+                title: '6. Unite: Biyografi / Otobiyografi Detayli Bilgi',
+                content: '<p><strong>Biyografi:</strong> Taninmis bir kisinin hayatinin tarafsiz bir sekilde anlatilmasidir.</p><p><strong>Otobiyografi:</strong> Kisinin kendi hayatini anlatmasidir.</p><p><strong>Tezkire:</strong> Divan edebiyatinda sairlerin hayatini anlatan eserlerdir. Ilk tezkire Ali Sir Nevai nin Mecalisun-Nefais eseridir.</p>'
+            },
+            'u7_detail': {
+                title: '7. Unite: Mektup ve E-Posta Detayli Bilgi',
+                content: '<p><strong>Mektup Turleri:</strong> Ozel, Edebi, Resmi ve Is mektuplari.</p><p><strong>Dilekce:</strong> Resmi makamlara sunulan, tarih, imza, adres ve net bir talep iceren resmi yazidir.</p>'
+            },
+            'u8_detail': {
+                title: '8. Unite: Gunluk ve Anı Detayli Bilgi',
+                content: '<p><strong>Gunluk:</strong> Gunu gunune yazilan, tarih atilan samimi metinlerdir.</p><p><strong>Anı (Hatira):</strong> Yasanmis olaylarin uzerinden zaman gectikten sonra kaleme alinmasidir.</p>'
+            },
+            'm_analiz': {
+                title: 'Metin Analizi ve Elestirel Okuma',
+                content: '<p>Yeni Maarif Modeli çerçevesinde ogrenciler metinleri ezberlemek yerine metnin yazildigi donemin sartlarini, yazarın estetik tutumunu ve metnin derin anlam katmanlarini elestirel bir suzgecden gecirirler.</p>'
+            },
+            'm_deger': {
+                title: 'Kulturel Birikim ve Deger Aktarimi',
+                content: '<p>Edebiyat dersi uzerinden milli kultur bilinci, dil sevgisi, vatan sevgisi ve etik degerler estetik bir dille ogretime dahil edilir.</p>'
+            },
+            'p1': {
+                title: 'Surgun Ulkeden Baskentler Baskentine',
+                content: '<div class="poem-box">Senin kalbinden surgun oldum once\nButun surgunluklerim bir bakima bu surgunun turevi\nButun torenlerin, solenlerin, ayinlerin yortularin disinda\nSana bakiyorum, seni goruyorum\nSeni dusunuyorum, seni yasiyorum\n\nSezai Karakoc</div>'
+            },
+            'p2': {
+                title: 'Munacat',
+                content: '<div class="poem-box">Beni bu sehir kapatmiyor, beni bu ev tutmuyor\nBeni bu cadde cekmiyor, beni bu insan anlamiyor\n\nIsmet Ozel</div>'
+            },
+            'p3': {
+                title: 'Kaldirimlar',
+                content: '<div class="poem-box">Sokaktayim, kimsesiz bir sokak ortasinda;\nYuruyorum, arkama bakmadan yuruyorum.\nYolumun karanliga saplanan noktasinda,\nSanki beni bekleyen bir hayal goruyorum.\n\nNecip Fazil Kisakurek</div>'
+            },
+            'p4': {
+                title: 'Bekleyen',
+                content: '<div class="poem-box">Ne hasta bekler sabahi,\nNe taze oluyu mezar.\nNe de seytan, bir gunahi,\nSeni bekledigim kadar.\n\nNecip Fazil Kisakurek</div>'
+            },
+            'p5': {
+                title: 'Monarosa',
+                content: '<div class="poem-box">Mona Rosa. Siyah guller, ak guller.\nGeyve nin gulleri ve beyaz kurdele.\nKanadi kirik kus merhamet ister.\nAh keske karsimda olsaydin öyle.\n\nSezai Karakoc</div>'
+            },
+            'p6': {
+                title: 'Ihlamurlar Cicek Aqtigi Zaman',
+                content: '<div class="poem-box">Dilimi baglasalar anilsa adin\nGozlerimi kapatsalar yuzun belirir\nIhlamurlar cicek acdigi zaman...\n\nBahaettin Karakoc</div>'
+            },
+            'p7': {
+                title: 'Kayit',
+                content: '<div class="poem-box">Anilar ve kayitlar, zamanin izinde derinlesir...\n\nCahit Zarifoglu</div>'
+            },
+            'p8': {
+                title: 'Ben Sana Mecburum',
+                content: '<div class="poem-box">Ben sana mecburum bilemezsin\nAdini mih gibi aklimda tutuyorum\nBuyudukce buyuyor gozlerin\nBen sana mecburum bilemezsin\n\nAttila Ilhan</div>'
+            },
+            'p9': {
+                title: 'Bulmak',
+                content: '<div class="poem-box">Aramak ve bulmak, ruhun en derin ikliminde yol almaktir.\n\nErdem Bayazit</div>'
+            },
+            'p10': {
+                title: 'Otuz Bes Yas',
+                content: '<div class="poem-box">Yas thirty five! yolun yarisi eder.\nDante gibi ortasindayiz omrun.\nDelikanli cagimizdaki cevher,\nGozunun yasina bakmadan gider.\n\nCahit Sitki Taranci</div>'
+            },
+            'a_sezai': {
+                title: 'Sezai Karakoc Hayati ve Eserleri',
+                content: '<p><strong>Hayati:</strong> Mistik ve II. Yeni akiminin en onemli saillerindendir. Dirilis dergisini kurmustur.</p><p><strong>Onemli Eserleri:</strong> Korfez, Sahdamar, Hizirla Kirk Saat, Monarosa.</p>'
+            },
+            'a_necip': {
+                title: 'Necip Fazil Kisakurek Hayati ve Eserleri',
+                content: '<p><strong>Hayati:</strong> Kaldirimlar Sairi olarak bilinir. Mistik ve felsefi derinligi yuksek siirler yazmistir.</p><p><strong>Onemli Eserleri:</strong> Cile, Reis Bey, Tohum.</p>'
+            },
+            'a_attila': {
+                title: 'Attila Ilhan Hayati ve Eserleri',
+                content: '<p><strong>Hayati:</strong> Mavi akiminin oncülerindendir. Toplumcu ve bireysel temalari bir arada islemistir.</p><p><strong>Onemli Eserleri:</strong> Sisler Bulvari, Yagmur Kacak, Sokaktaki Adam.</p>'
+            },
+            'a_cahit': {
+                title: 'Cahit Sitki Taranci Hayati ve Eserleri',
+                content: '<p><strong>Hayati:</strong> Saf siir anlayisinin temsilcisidir. Yasama sevinci ve olum temalarini islemistir.</p><p><strong>Onemli Eserleri:</strong> Otuz Bes Yas, Dusumden Ote.</p>'
+            }
+        };
+
+        function openModal(key) {
+            const data = modalData[key];
+            if (data) {
+                document.getElementById('modal_title').innerText = data.title;
+                document.getElementById('modal_body').innerHTML = data.content;
+                document.getElementById('modal_window').style.display = 'flex';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal_window').style.display = 'none';
+        }
+
+        function checkAns(btn, isCorrect) {
+            if (isCorrect) {
+                btn.style.backgroundColor = '#bbf7d0';
+                btn.style.borderColor = '#22c55e';
+                alert('Tebrikler! Dogru Cevap.');
+            } else {
+                btn.style.backgroundColor = '#fecaca';
+                btn.style.borderColor = '#ef4444';
+                alert('Yanlis cevap, tekrar deneyin.');
+            }
+        }
+
+        const gameItems = [
+            { id: 1, text: 'Necip Fazil', type: 'author' },
+            { id: 1, text: 'Cile', type: 'book' },
+            { id: 2, text: 'Attila Ilhan', type: 'author' },
+            { id: 2, text: 'Ben Sana Mecburum', type: 'book' },
+            { id: 3, text: 'Cahit Sitki', type: 'author' },
+            { id: 3, text: 'Otuz Bes Yas', type: 'book' },
+            { id: 4, text: 'Sezai Karakoc', type: 'author' },
+            { id: 4, text: 'Monarosa', type: 'book' }
+        ];
+
+        let selectedCards = [];
+
+        function initGame() {
+            const board = document.getElementById('game-board');
+            board.innerHTML = '';
+            const shuffled = [...gameItems].sort(() => Math.random() - 0.5);
+
+            shuffled.forEach((item) => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerText = item.text;
+                card.dataset.id = item.id;
+                
+                card.onclick = () => handleCardClick(card, item);
+                board.appendChild(card);
+            });
+        }
+
+        function handleCardClick(cardElement, item) {
+            if (cardElement.classList.contains('matched') || cardElement.classList.contains('selected')) {
+                return;
+            }
+
+            cardElement.classList.add('selected');
+            selectedCards.push({ element: cardElement, data: item });
+
+            if (selectedCards.length === 2) {
+                const [first, second] = selectedCards;
+
+                if (first.data.id === second.data.id && first.data.type !== second.data.type) {
+                    first.element.classList.remove('selected');
+                    second.element.classList.remove('selected');
+                    first.element.classList.add('matched');
+                    second.element.classList.add('matched');
+                    selectedCards = [];
+                } else {
+                    setTimeout(() => {
+                        first.element.classList.remove('selected');
+                        second.element.classList.remove('selected');
+                        selectedCards = [];
+                    }, 800);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
