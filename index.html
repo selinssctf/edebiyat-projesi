@@ -5,10 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>9. Sinif Edebiyat Portali - Maarif Modeli</title>
     <style> 
-        body, .container {
-    max-width: 100;
-    width: 100;
-    box-sizing: border-box;
+        @media (max-width: 768px) {
+    .container, .main, body, main, section, .content-wrapper, .wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        padding: 10px;
+    }
+
+    .sidebar, .nav, .menu, aside, .content, .main-content, .right-panel, .left-panel {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 0 15px 0;
+    }
+
+    h1, h2, h3 {
+        font-size: 1.5rem;
+        word-wrap: break-word;
+    
+}
+
+body, .container {
+    max-width: 100%;
+    width: 100%;
+
 }
         :root {
             --primary-bg: #0f172a;
