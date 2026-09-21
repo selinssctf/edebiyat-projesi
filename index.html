@@ -714,17 +714,18 @@ body, .container {
                 }
             }
         } 
+    </script> 
 
-<!-- 1. OYUN ALANI (BODY İÇİNDE YER ALMALI) -->
+<!-- 1. OYUN ALANI -->
     <div class="game-container">
-        <h2>⚡ Eser-Yazar Zamana Karşı Düello</h2>
+        <h2>⚡ Eser-Yazar Zamana Karsı Düello</h2>
         <div class="game-stats">
             <span>Süre: <span id="timer">30</span>s</span>
             <span>Puan: <span id="score">0</span></span>
         </div>
-        <div class="card-question" id="question-card">Oyunu Başlat butonuna bas!</div>
+        <div class="card-question" id="question-card">Oyunu Baslat butonuna bas!</div>
         <div class="options-grid" id="options-container"></div>
-        <button id="start-btn" onclick="startGame()" style="margin-top:15px; padding:10px 20px; font-size:1rem; cursor:pointer;">Oyunu Başlat</button>
+        <button id="start-btn" onclick="startGame()" style="margin-top:15px; padding:10px 20px; font-size:1rem; cursor:pointer;">Oyunu Baslat</button>
     </div>
 
     <!-- 2. CSS STİL KODLARI -->
@@ -772,71 +773,69 @@ body, .container {
     }
     </style>
 
-    <!-- 3. JAVASCRIPT OYUN MANTIĞI -->
-    <script>
-    const quizData = [
-        { question: "Aşk-ı Memnu", options: ["Halit Ziya Uşaklıgil", "Peyami Safa", "Reşat Nuri Güntekin", "Namık Kemal"], answer: "Halit Ziya Uşaklıgil" },
-        { question: "Çalıkuşu", options: ["Yakup Kadri", "Reşat Nuri Güntekin", "Ömer Seyfettin", "Ateşten Gömlek"], answer: "Reşat Nuri Güntekin" },
-        { question: "Dokuzuncu Hariciye Koğuşu", options: ["Peyami Safa", "Ahmet Hamdi Tanpınar", "Tarık Buğra", "Sabahattin Ali"], answer: "Peyami Safa" },
-        { question: "Yaban", options: ["Yakup Kadri Karaosmanoğlu", "Halide Edib Adıvar", "Mehmet Rauf", "Ziya Gökalp"], answer: "Yakup Kadri Karaosmanoğlu" }
-    ];
+    <!-- 3. JAVASCRIPT OYUN MANTIGI -->
+   <script>
+const quizData = [
+    { question: "Ask-i Memnu", options: ["Halit Ziya Usakligil", "Peyami Safa", "Resat Nuri Guntekin", "Namik Kemal"], answer: "Halit Ziya Usakligil" },
+    { question: "Calikusu", options: ["Yakup Kadri", "Resat Nuri Guntekin", "Omer Seyfettin", "Atesten Gomlek"], answer: "Resat Nuri Guntekin" },
+    { question: "Dokuzuncu Hariciye Kogusu", options: ["Peyami Safa", "Ahmet Hamdi Tanpinar", "Tarik Bugra", "Sabahattin Ali"], answer: "Peyami Safa" },
+    { question: "Yaban", options: ["Yakup Kadri Karaosmanoglu", "Halide Edib Adivar", "Mehmet Rauf", "Ziya Gokalp"], answer: "Yakup Kadri Karaosmanoglu" }
+];
 
-    let currentQ = 0;
-    let score = 0;
-    let timeLeft = 30;
-    let timerInterval;
+let currentQ = 0;
+let score = 0;
+let timeLeft = 30;
+let timerInterval;
 
-    function startGame() {
-        score = 0;
-        timeLeft = 30;
-        currentQ = 0;
-        document.getElementById("score").innerText = score;
+function startGame() {
+    score = 0;
+    timeLeft = 30;
+    currentQ = 0;
+    document.getElementById("score").innerText = score;
+    document.getElementById("timer").innerText = timeLeft;
+    document.getElementById("start-btn").style.display = "none";
+    
+    timerInterval = setInterval(() => {
+        timeLeft--;
         document.getElementById("timer").innerText = timeLeft;
-        document.getElementById("start-btn").style.display = "none";
-        
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            document.getElementById("timer").innerText = timeLeft;
-            if(timeLeft <= 0) {
-                clearInterval(timerInterval);
-                endGame();
-            }
-        }, 1000);
-
-        showQuestion();
-    }
-
-    function showQuestion() {
-        if(currentQ >= quizData.length) currentQ = 0;
-        let q = quizData[currentQ];
-        document.getElementById("question-card").innerText = q.question;
-        let optContainer = document.getElementById("options-container");
-        optContainer.innerHTML = "";
-        
-        q.options.forEach(opt => {
-            let btn = document.createElement("button");
-            btn.className = "option-btn";
-            btn.innerText = opt;
-            btn.onclick = () => checkAnswer(opt, q.answer);
-            optContainer.appendChild(btn);
-        });
-    }
-
-    function checkAnswer(selected, correct) {
-        if(selected === correct) {
-            score += 10;
-            document.getElementById("score").innerText = score;
+        if(timeLeft <= 0) {
+            clearInterval(timerInterval);
+            endGame();
         }
-        currentQ++;
-        showQuestion();
-    }
+    }, 1000);
 
-    function endGame() {
-        document.getElementById("question-card").innerText = "Süre Bitti! Toplam Puanın: " + score;
-        document.getElementById("options-container").innerHTML = "";
-        document.getElementById("start-btn").style.display = "inline-block";
-        document.getElementById("start-btn").innerText = "Tekrar Oyna";
+    showQuestion();
+}
+
+function showQuestion() {
+    if(currentQ >= quizData.length) currentQ = 0;
+    let q = quizData[currentQ];
+    document.getElementById("question-card").innerText = q.question;
+    let optContainer = document.getElementById("options-container");
+    optContainer.innerHTML = "";
+    
+    q.options.forEach(opt => {
+        let btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.innerText = opt;
+        btn.onclick = () => checkAnswer(opt, q.answer);
+        optContainer.appendChild(btn);
+    });
+}
+
+function checkAnswer(selected, correct) {
+    if(selected === correct) {
+        score += 10;
+        document.getElementById("score").innerText = score;
     }
-    </script>
-</body>
-</html>
+    currentQ++;
+    showQuestion();
+}
+
+function endGame() {
+    document.getElementById("question-card").innerText = "Sure Bitti! Toplam Puanin: " + score;
+    document.getElementById("options-container").innerHTML = "";
+    document.getElementById("start-btn").style.display = "inline-block";
+    document.getElementById("start-btn").innerText = "Tekrar Oyna";
+}
+</script>
