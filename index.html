@@ -713,7 +713,130 @@ body, .container {
                     }, 800);
                 }
             }
+        } 
+
+<!-- 1. OYUN ALANI (BODY İÇİNDE YER ALMALI) -->
+    <div class="game-container">
+        <h2>⚡ Eser-Yazar Zamana Karşı Düello</h2>
+        <div class="game-stats">
+            <span>Süre: <span id="timer">30</span>s</span>
+            <span>Puan: <span id="score">0</span></span>
+        </div>
+        <div class="card-question" id="question-card">Oyunu Başlat butonuna bas!</div>
+        <div class="options-grid" id="options-container"></div>
+        <button id="start-btn" onclick="startGame()" style="margin-top:15px; padding:10px 20px; font-size:1rem; cursor:pointer;">Oyunu Başlat</button>
+    </div>
+
+    <!-- 2. CSS STİL KODLARI -->
+    <style>
+    .game-container {
+        background: #1e293b;
+        border-radius: 12px;
+        padding: 20px;
+        color: #fff;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .game-stats {
+        display: flex;
+        justify-content: space-around;
+        font-size: 1.2rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    .card-question {
+        background: #334155;
+        padding: 20px;
+        font-size: 1.4rem;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        min-height: 60px;
+    }
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .option-btn {
+        background: #2563eb;
+        color: #fff;
+        border: none;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+    .option-btn:hover {
+        background: #1d4ed8;
+    }
+    </style>
+
+    <!-- 3. JAVASCRIPT OYUN MANTIĞI -->
+    <script>
+    const quizData = [
+        { question: "Aşk-ı Memnu", options: ["Halit Ziya Uşaklıgil", "Peyami Safa", "Reşat Nuri Güntekin", "Namık Kemal"], answer: "Halit Ziya Uşaklıgil" },
+        { question: "Çalıkuşu", options: ["Yakup Kadri", "Reşat Nuri Güntekin", "Ömer Seyfettin", "Ateşten Gömlek"], answer: "Reşat Nuri Güntekin" },
+        { question: "Dokuzuncu Hariciye Koğuşu", options: ["Peyami Safa", "Ahmet Hamdi Tanpınar", "Tarık Buğra", "Sabahattin Ali"], answer: "Peyami Safa" },
+        { question: "Yaban", options: ["Yakup Kadri Karaosmanoğlu", "Halide Edib Adıvar", "Mehmet Rauf", "Ziya Gökalp"], answer: "Yakup Kadri Karaosmanoğlu" }
+    ];
+
+    let currentQ = 0;
+    let score = 0;
+    let timeLeft = 30;
+    let timerInterval;
+
+    function startGame() {
+        score = 0;
+        timeLeft = 30;
+        currentQ = 0;
+        document.getElementById("score").innerText = score;
+        document.getElementById("timer").innerText = timeLeft;
+        document.getElementById("start-btn").style.display = "none";
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById("timer").innerText = timeLeft;
+            if(timeLeft <= 0) {
+                clearInterval(timerInterval);
+                endGame();
+            }
+        }, 1000);
+
+        showQuestion();
+    }
+
+    function showQuestion() {
+        if(currentQ >= quizData.length) currentQ = 0;
+        let q = quizData[currentQ];
+        document.getElementById("question-card").innerText = q.question;
+        let optContainer = document.getElementById("options-container");
+        optContainer.innerHTML = "";
+        
+        q.options.forEach(opt => {
+            let btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerText = opt;
+            btn.onclick = () => checkAnswer(opt, q.answer);
+            optContainer.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selected, correct) {
+        if(selected === correct) {
+            score += 10;
+            document.getElementById("score").innerText = score;
         }
+        currentQ++;
+        showQuestion();
+    }
+
+    function endGame() {
+        document.getElementById("question-card").innerText = "Süre Bitti! Toplam Puanın: " + score;
+        document.getElementById("options-container").innerHTML = "";
+        document.getElementById("start-btn").style.display = "inline-block";
+        document.getElementById("start-btn").innerText = "Tekrar Oyna";
+    }
     </script>
 </body>
 </html>
